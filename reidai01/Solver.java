@@ -12,12 +12,14 @@ public class Solver {
     private static long start;
     private static long end;
 
+    private static boolean DEBUG = true;
+
     public static void answer() {
         start = System.currentTimeMillis();
 
         //for (int i = 0; i < size; i++) result[i] = i;
         result = geneticAlgorithmAll();
-        twoOptimization();
+        //twoOptimization();
 
         submission();
     }
@@ -26,8 +28,8 @@ public class Solver {
      *
      */
     private static int[] geneticAlgorithmAll() {
-        int numberOfKeepingParents = 49;
-        int numberOfCrossOver = 50;
+        int numberOfKeepingParents = 10000;
+        int numberOfCrossOver = 10000;
         List<Gene> parents = initGenes(numberOfKeepingParents);
         PriorityQueue<Gene> children = new PriorityQueue<>();
 
@@ -37,9 +39,9 @@ public class Solver {
         while (System.currentTimeMillis() - start < TLE - MARGIN) {
             //交叉する
             for (int i = 0; i < numberOfCrossOver; i++) {
-                int aParent = decideParent(numberOfKeepingParents);
-                int anotherParent = decideParent(numberOfKeepingParents);
-                Gene[] child = parents.get(aParent).crossOver(parents.get(anotherParent));
+                Gene aParent = decideParent(numberOfKeepingParents, parents);
+                Gene anotherParent = decideParent(numberOfKeepingParents, parents);
+                Gene[] child = aParent.crossOver(anotherParent);
 
                 if (child == null) {
                     i--;
@@ -49,16 +51,16 @@ public class Solver {
             }
 
             //子を厳選する, 親に移す
-            for (int i = 0; i < numberOfKeepingParents; i++){
+            for (int i = 0; i < numberOfKeepingParents; i++) {
                 parents.set(i, children.poll());
             }
 
             children.clear();
 
-            if(best.compareTo(parents.get(0)) > 0){
+            if (best.compareTo(parents.get(0)) > 0) {
                 best = parents.get(0);
             }
-            //System.err.println("gen " + gen + " , " + best);
+            if (DEBUG) System.out.println("gen " + gen + " , " + best);
             gen++;
         }
 
@@ -68,22 +70,30 @@ public class Solver {
     private static List<Gene> initGenes(int size) {
         List<Gene> parents = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            int[] rand = randomSelect();
-            int sc = getCurrentDistance(rand);
-            Gene g = new Gene(rand, sc);
+            result = randomSelect();
+            //twoOptimization();
+            int sc = getCurrentDistance(result);
+            Gene g = new Gene(result, sc);
             parents.add(g);
         }
         Collections.sort(parents);
         return parents;
     }
 
-    private static int decideParent(int range) {
-        int bound = (int) Math.sqrt(range);
+    private static Gene decideParent(int range, List<Gene> parents) {
+
         Random rand = new Random();
+        /*
+        int bound = (int) Math.sqrt(range);
         int value = rand.nextInt(bound) + 1;
         value *= (rand.nextInt(bound) + 1);
         value--;
         return value;
+        */
+        PriorityQueue<Gene> pq = new PriorityQueue<>();
+        for (int i = 0; i < 4; i++) pq.add(parents.get(rand.nextInt(range)));
+
+        return pq.peek();
     }
 
     /**
@@ -207,8 +217,10 @@ public class Solver {
                 }
             }
             if (s == Solver.minDistance) break;
-            System.err.println(yaju + "th try");
-            print();
+            if (DEBUG){
+                System.err.println(yaju + "th try");
+                print();
+            }
         }
     }
 
@@ -235,8 +247,10 @@ public class Solver {
     }
 
     private static void submission() {
-        System.err.println("final try");
-        print();
+        if(DEBUG){
+            System.err.println("final try");
+            print();
+        }
 
         TSP2D.submit(result);
     }

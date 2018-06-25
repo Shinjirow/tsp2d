@@ -77,6 +77,25 @@ public class Gene implements Comparable<Gene> {
             aChild.route[i] = converter.convert(pair.route[i]);
         }
 
+        //突然変異
+        Random rand = new Random();
+        if (rand.nextInt(100) == 0) {
+            int i = rand.nextInt(route.length - 1) + 1;
+            int j = rand.nextInt(route.length - 1) + 1;
+            int tmp = aChild.route[i];
+            aChild.route[i] = aChild.route[j];
+            aChild.route[j] = tmp;
+        }
+        if (rand.nextInt(50) == 0) {
+            int i = rand.nextInt(route.length - 2) + 1;
+            int j = 0;
+            while (j < i) j = rand.nextInt(route.length - 2) + 1;
+
+            int tmp = aChild.route[j];
+            for (int k = j - 1; k >= i; k--) aChild.route[k + 1] = aChild.route[k];
+            aChild.route[i] = tmp;
+        }
+
         aChild.score = Solver.getCurrentDistance(aChild.route);
 
         return aChild;
