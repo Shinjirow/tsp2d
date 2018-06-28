@@ -51,7 +51,7 @@ public class Solver {
      * DEBUG
      * デバッグ用変数
      */
-    private static boolean DEBUG = true;
+    private static boolean DEBUG = false;
 
     /**
      * 回答するメソッド
@@ -86,6 +86,15 @@ public class Solver {
 
         int gen = 1;
         while (System.currentTimeMillis() - start < TLE - MARGIN) {
+            /*
+            データ取り用の分岐
+            if (gen % 50 == 1) {
+                result = best.getRoute();
+                System.err.println("gen " + gen + ", cost " + getCurrentDistance(result));
+                print();
+            }
+            */
+
             //交叉する
             for (int i = 0; i < numberOfCrossOver; i++) {
                 Gene aParent = decideParent(numberOfKeepingParents, parents);
@@ -100,7 +109,7 @@ public class Solver {
             }
 
             //子を厳選する, 親に移す
-            //parents.add(best);
+            //parents.add(best);  エリート保存は早期収束の原因となったので削除
             for (int i = 0; i < numberOfKeepingParents; i++) {
                 parents.set(i, children.poll());
             }
@@ -111,6 +120,7 @@ public class Solver {
             if (best.compareTo(parents.get(0)) > 0) {
                 best = parents.get(0);
             }
+
 
             if (DEBUG) System.out.println("current best, gen[" + gen + "] = " + best);
             gen++;
@@ -148,7 +158,7 @@ public class Solver {
      *
      * @param range   親の大きさ リストのサイズ取得すれば不要な引数やんけ
      * @param parents 親のリスト
-     * @return
+     * @return 遺伝子
      */
     private static Gene decideParent(int range, List<Gene> parents) {
 
@@ -210,7 +220,7 @@ public class Solver {
      * randomSelect
      * 乱択で経路を生やすメソッド
      *
-     * @return
+     * @return 経路
      */
     private static int[] randomSelect() {
         Integer[] order = new Integer[size - 1];
