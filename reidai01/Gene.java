@@ -84,6 +84,7 @@ public class Gene implements Comparable<Gene> {
         return children;
     }
 
+
     /**
      * PMXConverter
      * PMX法による交叉を実現するための変換テーブル

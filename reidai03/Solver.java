@@ -42,7 +42,7 @@ public class Solver {
      * MARGIN
      * TLEに対する余裕を持ったやつ 単位はms
      */
-    private static long MARGIN = 100;
+    private static long MARGIN = 300;
 
     /**
      * DEBUG
